@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+</head>
+
+<body>
+  <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+  <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    #map {
+      position: absolute;
+      z-index: 5;
+    }
+
+    #msg {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      transform: translate(-50%, 5px);
+      background-color: rgba(40, 40, 40, .8);
+      padding: 10px;
+      color: #eee;
+      width: 350px;
+      text-align: center;
+    }
+
+    .ol-control button {
+      background-color: rgba(40, 40, 40, 0.85) !important;
+    }
+
+    .ol-control button:hover {
+      background-color: rgba(40, 40, 40, 1) !important;
+    }
+  </style>
+
+  <div id="localizacaoAtual"></div>
+  <div id="map" class="map"></div>
+
+  <script type="text/JavaScript">
+
+    class Rota {
+      constructor() {
+        this.coordenadaPartida = { x: null, y: null };
+        this.coordenadaDestino = { x: null, y: null };
+        this.rotaLineString = [];
+        this.polyline = null;
+      }
+
+      set coordenadaPartida(value) { this._coordenadaPartida = value; }
+      set coordenadaDestino(value) { this._coordenadaDestino = value; }
+      set rotaLineString(value) { this._rotaLineString = value; }
+      set polyline(value) { this._polyline = value; }
+
+      get coordenadaPartida() { return this._coordenadaPartida; }
+      get coordenadaDestino() { return this._coordenadaDestino; }
+      get rotaLineString() { return this._rotaLineString; }
+      get polyline() { return this._polyline; }
+    }
+
+    var points = [];
+    var routeCoords;
+    var polyline;
+    var lineString;
+    var rota = new Rota();
+
+    // URL para as APIs
+    var url_osrm_nearest = 'http://router.project-osrm.org/nearest/v1/driving/';
+    var url_osrm_route = 'http://router.project-osrm.org/route/v1/driving/';
+    var icon_url = 'http://cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png';
+    
+    var vectorSource = new ol.source.Vector();
+    var vectorLayer = new ol.layer.Vector({source: vectorSource});
+    var permitirGeolocalizacao = true;
+    var cont = 0;
+    var currentLocation = [-4932276.010728907, -284451.2442564194]; 
+
+    const divElement = document.querySelector('#localizacaoAtualizada');
+    if (divElement) {
+      const dataAttributeValueLongitude = divElement.getAttribute('data-custom-attribute-longitute');
+      const dataAttributeValueLatitude = divElement.getAttribute('data-custom-attribute-latitude');
+      if (dataAttributeValueLongitude && dataAttributeValueLatitude) {
+        currentLocation = [parseFloat(dataAttributeValueLongitude), parseFloat(dataAttributeValueLatitude)];
+      }
+    }
+
+    function montarPonto(coord) {
+      utils.getNearest(coord).then(function(coord_street) {
+        utils.createFeature(coord_street);
+      });
+    }
+
+    var styles = {
+      route: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          width: 6, color: [40, 40, 40, 0.8]
+        })
+      }),
+      icon: new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          src: icon_url
+        })
+      })
+    };
+
+    var map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM()
+        }),
+        vectorLayer
+      ],
+      view: new ol.View({
+        center: currentLocation,
+        zoom: 15
+      })
+    });
+
+    var utils = {
+      getNearest: function(coord) {
+        var coord4326 = utils.to4326(coord);
+        return new Promise(function(resolve, reject) {
+          fetch(url_osrm_nearest + coord4326.join()).then(function(response) {
+            return response.json();
+          }).then(function(json) {
+            if (json.code === 'Ok') resolve(json.waypoints[0].location);
+            else reject(new Error('Erro ao obter o ponto mais próximo.'));
+          });
+        });
+      },
+      createFeature: function(coord) {
+        var feature = new ol.Feature({
+          type: 'place',
+          geometry: new ol.geom.Point(ol.proj.fromLonLat(coord))
+        });
+        feature.setStyle(styles.icon);
+        vectorSource.addFeature(feature);
+      },
+      removeAllFeatures: function() {
+        vectorSource.clear();
+      },
+      createRoute: function(polyline) {
+        var route = new ol.format.Polyline({
+          factor: 1e5
+        }).readGeometry(polyline, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+
+        var routeCoords = route.getCoordinates();
+        var rotaLineStringArray = [];
+
+        for (var i = 0; i < routeCoords.length; i++) {
+          let ponto = { x: routeCoords[i][0], y: routeCoords[i][1] };
+          rotaLineStringArray.push(ponto);
+        }
+
+        var feature = new ol.Feature({
+          type: 'route',
+          geometry: route
+        });
+
+        feature.setStyle(styles.route);
+        vectorSource.addFeature(feature);
+        
+        return rotaLineStringArray;
+      },
+      to4326: function(coord) {
+        return ol.proj.transform([
+          parseFloat(coord[0]), parseFloat(coord[1])
+        ], 'EPSG:3857', 'EPSG:4326');
+      }
+    };
+
+    map.on('click', function(evt) {
+    if (cont === 2){
+        utils.removeAllFeatures();
+        cont = 0;
+        points = [];
+        routeCoords = undefined;
+     }
+      handleMapClick(evt).then(function() {
+        if (cont === 2) {
+          rota.rotaLineString = lineString;
+          rota.polyline = polyline;
+          if (window.ReactNativeWebView && typeof window.ReactNativeWebView.postMessage === 'function') {
+            window.ReactNativeWebView.postMessage(JSON.stringify(rota));
+          }
+        }
+      }).catch(function(error) {
+        console.error('Erro durante o manuseio do clique no mapa:', error);
+      });
+    });
+
+    function handleMapClick(evt) {
+      return new Promise(function(resolve, reject) {
+        if (routeCoords) {
+          utils.removeAllFeatures();
+          cont = 0;
+          points = [];
+          routeCoords = undefined;
+        }
+
+        if (cont === 0) {
+          rota.coordenadaPartida = {
+            x: evt.coordinate[0],
+            y: evt.coordinate[1]
+          };
+        } else if (cont === 1) {
+          rota.coordenadaDestino = {
+            x: evt.coordinate[0],
+            y: evt.coordinate[1]
+          };
+        }
+
+        utils.getNearest(evt.coordinate).then(function(coord_street) {
+          var last_point = points[points.length - 1];
+          points.push(coord_street);
+          utils.createFeature(coord_street);
+
+          var point1 = last_point.join();
+          var point2 = coord_street.join();
+          fetch(url_osrm_route + point1 + ';' + point2 + '?steps=true&overview=full').then(function(r) {
+            return r.json();
+          }).then(function(json) {
+            if (json.code !== 'Ok') {
+              reject(new Error('Código de resposta inválido da solicitação de rota.'));
+              return;
+            }
+            points.length = 0;
+            lineString = utils.createRoute(json.routes[0].geometry);
+            polyline = json.routes[0].geometry;
+            resolve(); 
+          });
+        });
+        cont++;
+      });
+    }
+  </script>
+
+</body>
+
+</html>

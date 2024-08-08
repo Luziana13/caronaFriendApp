@@ -93,13 +93,15 @@ const MapScreen = (props) => {
         setModalVisible(true);
     };
 
+
+
     const handleSave = async () => {
         try {
             const body = {
                 idPessoa: userId,
                 dataCarona: `${caronaDate}T${caronaTime}`,
                 tipoCarona: 'OFERTA',
-                vaga: parseInt(vagas, 10),
+                vagasTotais: parseInt(vagas, 10),
                 rota: {
                     coordenadaPartida: rota.coordenadaPartida,
                     coordenadaDestino: rota.coordenadaDestino,
@@ -131,6 +133,11 @@ const MapScreen = (props) => {
 
     const handleCloseModal = () => {
         setModalVisible(false);
+        zoomToGeoJSON();
+    };
+
+    const handleOpenModal = () => {
+        setModalVisible(true);
         zoomToGeoJSON();
     };
 
@@ -206,6 +213,10 @@ const MapScreen = (props) => {
                     </View>
                 </View>
             </Modal>
+
+            <TouchableOpacity style={styles.floatingButtonDetalhe} onPress={handleOpenModal}>
+                <Text style={styles.buttonText}>Detalhes</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.floatingButton} onPress={reloadWebView}>
                 <Text style={styles.buttonText}>Atualizar</Text>

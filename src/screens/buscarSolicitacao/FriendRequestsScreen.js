@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, FlatList, Text, TouchableOpacity, Image, Modal, ActivityIndicator, Alert } from 'react-native';
 import { apiFetch } from '../../services/apiFetch';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons }  from '@expo/vector-icons';
 import styles from './styles';
 
 const FriendRequestsScreen = () => {
@@ -67,7 +67,7 @@ const FriendRequestsScreen = () => {
       );
     }
     return (
-      <Icon name="person" size={40} color="#fff" />
+      <MaterialIcons name="person" size={40} color="#fff" />
     );
   };
 
@@ -109,13 +109,13 @@ const FriendRequestsScreen = () => {
                 style={styles.acceptButton}
                 onPress={() => handleRequest(item.idAmizade, 'aceitar')}
               >
-                <Icon name="check" size={24} color="#fff" />
+                <MaterialIcons name="check" size={24} color="#fff" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.rejectButton}
                 onPress={() => handleRequest(item.idAmizade, 'recusar')}
               >
-                <Icon name="close" size={24} color="#fff" />
+                <MaterialIcons name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
           </View>

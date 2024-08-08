@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, FlatList, Text, TouchableOpacity, Image, Modal, ActivityIndicator, Alert } from 'react-native';
 import { apiFetch } from '../../services/apiFetch';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons }  from '@expo/vector-icons';
 import styles from './styles';
 
 const SearchScreen = () => {
@@ -57,7 +57,7 @@ const SearchScreen = () => {
       );
     }
     return (
-      <Icon name="person" size={40} color="#fff" />
+      <MaterialIcons name="person" size={40} color="#fff" />
     );
   };
 
@@ -89,7 +89,7 @@ const SearchScreen = () => {
           style={styles.input}
         />
         <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-          <Icon name="search" size={24} color="#fff" />
+          <MaterialIcons name="search" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
       {error && <Text style={styles.errorMessage}>{error}</Text>}

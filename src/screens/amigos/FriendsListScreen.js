@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, FlatList, Text, TouchableOpacity, Image, Modal, ActivityIndicator, Alert } from 'react-native';
 import { apiFetch } from '../../services/apiFetch';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons }  from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import styles from './styles';
 
@@ -82,7 +82,7 @@ const FriendsListScreen = () => {
       );
     }
     return (
-      <Icon name="person" size={40} color="#fff" />
+      <MaterialIcons name="person" size={40} color="#fff" />
     );
   };
 
@@ -124,7 +124,7 @@ const FriendsListScreen = () => {
                 style={styles.rejectButton}
                 onPress={() => handleDelete(item.idAmizade)}
               >
-                <Icon name="close" size={20} color="#fff" />
+                <MaterialIcons name="close" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
           </View>

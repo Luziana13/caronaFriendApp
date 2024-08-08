@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MaterialIcons }  from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HeaderWithLogout = () => {
@@ -20,7 +20,7 @@ const HeaderWithLogout = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handleLogout}>
-        <Icon name="logout" size={25} color="#777" />
+        <MaterialIcons name="logout" size={25} color="#777" />
       </TouchableOpacity>
     </View>
   );

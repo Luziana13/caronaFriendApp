@@ -51,6 +51,16 @@ const styles = StyleSheet.create({
         padding: 15,
         elevation: 5,
     },
+    floatingButtonDetalhe: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#3b8aad',
+        borderRadius: 50,
+        padding: 15,
+        elevation: 5,
+        marginRight: '65%'
+    },
     buttonText: {
         color: '#FFFFFF',
         fontSize: 16,

@@ -12,15 +12,12 @@
       "backgroundColor": "#3b8aadd"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.luziana13.CaronaFriendApp"
+      "bundleIdentifier": "com.yourcompany.yourappname",
+      "buildNumber": "1.0.0"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.luziana13.CaronaFriendApp"
+      "package": "com.yourcompany.yourappname",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

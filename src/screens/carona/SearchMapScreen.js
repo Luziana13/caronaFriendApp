@@ -99,7 +99,7 @@ const SearchScreen = (props) => {
                 idPessoa: userId,
                 dataCarona: `${searchDate}T${searchTime}`,
                 tipoCarona: 'BUSCA',
-                vaga: parseInt(vagas, 10),
+                vagasTotais: parseInt(vagas, 10),
                 rota: {
                     coordenadaPartida: rota.coordenadaPartida,
                     coordenadaDestino: rota.coordenadaDestino,
@@ -135,6 +135,11 @@ const SearchScreen = (props) => {
         setWebViewKey(prevKey => prevKey + 1); // Force reload WebView
     };
 
+    const handleOpenModal = () => {
+        setModalVisible(true);
+        zoomToGeoJSON();
+    };
+    
     const reloadWebView = () => {
         setWebViewKey(prevKey => prevKey + 1); // Force reload WebView
     };
@@ -207,6 +212,10 @@ const SearchScreen = (props) => {
                     </View>
                 </View>
             </Modal>
+
+            <TouchableOpacity style={styles.floatingButtonDetalhe} onPress={handleOpenModal}>
+                <Text style={styles.buttonText}>Detalhes</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.floatingButton} onPress={reloadWebView}>
                 <Text style={styles.buttonText}>Atualizar</Text>
